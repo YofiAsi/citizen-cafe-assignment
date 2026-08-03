@@ -9,12 +9,12 @@ Goal: a repeatable offline workflow that produces ~10 Hebrew ↔ English pairs (
 
 ## Card Contract
 
-- Fields per card: `hebrew` (with nikud, preserved exactly) and `english`. No transliteration, no notes.
+- Fields per card: `id` (stable, unique within the deck — decision #18), `hebrew` (with nikud, preserved exactly), and `english`. No transliteration, no notes.
 - Seed file shape follows the brief's example, typed:
 
 ```ts
 // seed/data.ts
-export interface Pair { hebrew: string; english: string }
+export interface Pair { id: string; hebrew: string; english: string }
 export interface DeckContent { level: string; type: number | null; pairs: Pair[] }
 export const content: DeckContent[] = [ ... ]
 ```
