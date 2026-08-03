@@ -14,6 +14,10 @@ export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
+    // Prisma 7 registers the seed command here (the package.json#prisma key is
+    // deprecated). `prisma db seed` / `pnpm seed` and `prisma migrate reset`
+    // run this via tsx (decision #13, plan 4c).
+    seed: "tsx seed/seed.ts",
   },
   // The Prisma CLI (migrations, introspection) connects with DIRECT_URL — the
   // direct, unpooled Neon connection string, which is what migrations require.
