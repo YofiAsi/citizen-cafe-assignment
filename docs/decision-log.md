@@ -4,6 +4,8 @@ Newest first. Every non-obvious technical or product decision gets a row: what w
 
 | # | Decision | Rationale |
 |---|---|---|
+| 17 | "Types only under Freedom" is descriptive, not enforced: no DB or domain constraint ties types to a tier | Current taxonomy happens to put types in Freedom; schema stays flexible if that changes |
+| 16 | Level colours are not stored in the DB; the DB stores only the level slug and the UI maps slug → design token (8a). Types inherit their level's colour | Colour is a presentation concern; keeps the Design Bible/tokens the single source of colour truth, no re-seed on palette changes |
 | 15 | Content unit named "deck" (a level without types, or a level + type pair), replacing "leaf" | Flashcard-native term that reads well in domain code and UI; "leaf" was tree jargon |
 | 14 | Verb citation form mixed by tier: present tense (m.sg.) in Foundation, infinitive from Flow up | Beginners meet the form they hear in speech; standard dictionary form once past survival vocab |
 | 13 | Prisma 7 env wiring: `prisma.config.ts` `datasource.url` reads `DIRECT_URL` (CLI/migrations use the unpooled connection); runtime Prisma Client will use pooled `DATABASE_URL`; `.env` loaded via Node's built-in `process.loadEnvFile()` | Prisma 7 has no `directUrl` field and no longer auto-loads `.env`; the config file is consumed only by CLI tooling, so pointing it at `DIRECT_URL` gives migrations the direct connection with no extra dependency (`process.loadEnvFile` avoids adding `dotenv`) |
