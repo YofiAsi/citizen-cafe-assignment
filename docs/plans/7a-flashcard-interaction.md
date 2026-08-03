@@ -1,9 +1,9 @@
 # Plan 7a — Flashcard Interaction Spec
 
 The deck's interaction model, settled by prototyping in a dev harness and now
-frozen. Implemented in `src/app/components/flashcards/card-deck.tsx`; the
-harness at `/dev/cards` renders it against sample cards. The product page that
-feeds it real cards is 7b.
+frozen. Implemented in `src/app/components/flashcards/card-deck.tsx` and fed
+real cards by the home page (7b). The prototyping harness and the design-system
+showcase have been removed — the router carries the one product route.
 
 ## Model
 
