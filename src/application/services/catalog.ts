@@ -4,6 +4,7 @@
 // callers never reach into infrastructure. No other service code.
 
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import {
   getCatalog as getCatalogQuery,
   listTiers as listTiersQuery,
@@ -21,8 +22,25 @@ export type {
   CatalogTierDTO,
 } from "@/infrastructure/persistence/queries";
 
-export const getCatalog = cache(getCatalogQuery);
+/* Content is static and only changes via a manual reseed (project-brief.md
+   "Content Pipeline"), so an hour of staleness is fine — not a correctness
+   risk, given there's no per-user state and no writes (decision #28). */
+const CONTENT_REVALIDATE_SECONDS = 60 * 60;
+
+// getCatalog and getCards sit behind every dropdown navigation (the URL is
+// the source of truth per decision #26), so `cache()`'s per-request dedupe
+// wasn't enough — each navigation is a new request and re-hit Neon. Adding
+// `unstable_cache` persists results across requests instead.
+export const getCatalog = cache(
+  unstable_cache(getCatalogQuery, ["catalog"], {
+    revalidate: CONTENT_REVALIDATE_SECONDS,
+  }),
+);
 export const listTiers = cache(listTiersQuery);
 export const listLevels = cache(listLevelsQuery);
 export const listTypes = cache(listTypesQuery);
-export const getCards = cache(getCardsQuery);
+export const getCards = cache(
+  unstable_cache(getCardsQuery, ["cards"], {
+    revalidate: CONTENT_REVALIDATE_SECONDS,
+  }),
+);
