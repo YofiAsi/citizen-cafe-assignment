@@ -1,1 +1,185 @@
 @import "tailwindcss";
+
+/*
+ * Citizen Café design tokens — plan 8a.
+ * Single @theme origin (Tailwind 4 CSS-first). Every value traces to the
+ * Design Bible (docs/citizen-cafe-design-bible.md) or a numbered Open Question
+ * from docs/plans/8a-design-tokens.md.
+ *
+ * PROVISIONAL markers: no Figma access. Values the Bible states explicitly are
+ * used exactly; values marked "extract from Figma / needs formalization" use a
+ * conservative default flagged `PROVISIONAL — replace with Figma value`.
+ */
+@theme {
+  /* ---------------------------------------------------------------------- */
+  /* T1 — Brand / surface / text / border colours (Bible §5)                */
+  /* ---------------------------------------------------------------------- */
+
+  /* Brand — stated in Bible §5 canonical tokens */
+  --color-brand-yellow: #f9e24c; /* Bible §5 brand.yellow */
+  --color-brand-charcoal: #373230; /* Bible §5 brand.charcoal */
+  --color-brand-white: #ffffff; /* Bible §5 brand.white */
+
+  /* Yellow interaction states — OQ4 (Bible §5 "derive accessible hover /
+     pressed states for yellow intentionally"; no values given). Darker than
+     base yellow so charcoal text stays AA on hover/press. */
+  --color-brand-yellow-hover: #f2d835; /* PROVISIONAL — replace with Figma value (OQ4) */
+  --color-brand-yellow-pressed: #e4c62a; /* PROVISIONAL — replace with Figma value (OQ4) */
+
+  /* Surfaces — Bible §5 */
+  --color-surface-base: #f2f1ec; /* Bible §5 surface.base; lighter end of stated range #F2F1EC–#EEECE6 (OQ7) */
+  --color-surface-raised: #ffffff; /* Bible §5 surface.raised */
+  --color-surface-dark: #373230; /* Bible §5 surface.dark (charcoal) */
+
+  /* Text — Bible §5 */
+  --color-text-primary: #373230; /* Bible §5 text.primary */
+  --color-text-muted: #716c66; /* Bible §5 text.muted */
+  --color-text-inverse: #ffffff; /* Bible §5 text.inverse */
+
+  /* Borders — Bible §5 / §14 */
+  --color-border-subtle: #d2cec6; /* Bible §5 line.subtle / §14 border.default */
+  --color-border-strong: #a9a499; /* PROVISIONAL — replace with Figma value (OQ6); darker warm neutral than subtle */
+
+  /* ---------------------------------------------------------------------- */
+  /* T2 — Level colours (taxonomy 4a). First-class semantic colour per       */
+  /* level; slug matches the taxonomy level identifier so app code maps      */
+  /* level.slug -> var(--color-level-<slug>). Each fill pairs with an `-on`  */
+  /* text colour (charcoal or white) that passes WCAG AA (>=4.5) against it. */
+  /* All hexes PROVISIONAL except level Yellow (= Bible §5 brand.yellow).    */
+  /* ---------------------------------------------------------------------- */
+
+  /* Foundation tier */
+  --color-level-red: #c0392b; /* PROVISIONAL — replace with Figma value (OQ1) */
+  --color-level-red-on: #ffffff; /* AA 5.44 on red */
+  --color-level-orange: #e19a4e; /* PROVISIONAL — replace with Figma value (OQ1) */
+  --color-level-orange-on: #373230; /* AA 5.38 on orange */
+  --color-level-pink: #e58fa8; /* PROVISIONAL — replace with Figma value (OQ1) */
+  --color-level-pink-on: #373230; /* AA 5.31 on pink */
+  --color-level-yellow: #f9e24c; /* Bible §5 brand.yellow (level Yellow) */
+  --color-level-yellow-on: #373230; /* AA 9.64 on yellow */
+
+  /* Flow tier */
+  --color-level-light-blue: #7fb5d9; /* PROVISIONAL — replace with Figma value (OQ1) */
+  --color-level-light-blue-on: #373230; /* AA 5.73 on light-blue */
+  --color-level-blue: #2f6f9e; /* PROVISIONAL — replace with Figma value (OQ1) */
+  --color-level-blue-on: #ffffff; /* AA 5.40 on blue */
+  --color-level-lime: #a8c64f; /* PROVISIONAL — replace with Figma value (OQ1) */
+  --color-level-lime-on: #373230; /* AA 6.53 on lime */
+  --color-level-green: #347a40; /* PROVISIONAL — replace with Figma value (OQ1) */
+  --color-level-green-on: #ffffff; /* AA 5.24 on green */
+
+  /* Freedom tier */
+  --color-level-dark-green: #2e6b45; /* PROVISIONAL — replace with Figma value (OQ1) */
+  --color-level-dark-green-on: #ffffff; /* AA 6.35 on dark-green */
+  --color-level-turquoise: #5fbdb4; /* PROVISIONAL — replace with Figma value (OQ1) */
+  --color-level-turquoise-on: #373230; /* AA 5.67 on turquoise */
+  --color-level-indigo: #43458f; /* PROVISIONAL — replace with Figma value (OQ1) */
+  --color-level-indigo-on: #ffffff; /* AA 8.45 on indigo */
+  --color-level-purple: #7a4e9e; /* PROVISIONAL — replace with Figma value (OQ1) */
+  --color-level-purple-on: #ffffff; /* AA 6.16 on purple */
+
+  /* ---------------------------------------------------------------------- */
+  /* T3 — Typography (Bible §6). Families only are stated; sizes/weights/    */
+  /* line-heights are OQ8. Font *loading* (Fedra/Assistant via next/font)   */
+  /* is plan 8b — these stacks resolve to fallbacks for now.                 */
+  /* ---------------------------------------------------------------------- */
+
+  /* Functional/system voice — Assistant (Bible §6 "Assistant = system").
+     Includes a Hebrew fallback since content is bilingual (RTL Hebrew). */
+  --font-sans: "Assistant", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans Hebrew", sans-serif;
+
+  /* Expressive/brand voice — Fedra (Bible §6 "Fedra = voice"; §3 serif
+     editorial headlines). Seam: currently resolves to a serif fallback;
+     Fedra Serif slots in ahead of the fallbacks in plan 8b when files exist. */
+  --font-brand: "Fedra Serif", ui-serif, Georgia, Cambria, "Times New Roman",
+    "Noto Serif Hebrew", serif;
+
+  /* Role scale (Bible §6 roles). Sizes/weights PROVISIONAL (OQ8). The only
+     fixed Bible constraint is body line-height >= 1.4. Family per role is a
+     review guardrail (Fedra = display/headings, Assistant = the rest). */
+
+  /* display.hero — Fedra */
+  --text-display: 3.5rem; /* PROVISIONAL — replace with Figma value (OQ8) */
+  --text-display--line-height: 1.05; /* PROVISIONAL — replace with Figma value (OQ8) */
+  --text-display--font-weight: 700; /* PROVISIONAL — replace with Figma value (OQ8) */
+
+  /* heading.h1 — Fedra */
+  --text-h1: 2.5rem; /* PROVISIONAL — replace with Figma value (OQ8) */
+  --text-h1--line-height: 1.15; /* PROVISIONAL — replace with Figma value (OQ8) */
+  --text-h1--font-weight: 700; /* PROVISIONAL — replace with Figma value (OQ8) */
+
+  /* heading.h2 — Fedra */
+  --text-h2: 1.875rem; /* PROVISIONAL — replace with Figma value (OQ8) */
+  --text-h2--line-height: 1.2; /* PROVISIONAL — replace with Figma value (OQ8) */
+  --text-h2--font-weight: 600; /* PROVISIONAL — replace with Figma value (OQ8) */
+
+  /* body.default — Assistant */
+  --text-body: 1rem; /* PROVISIONAL size — replace with Figma value (OQ8) */
+  --text-body--line-height: 1.5; /* Bible §6 fixed constraint: body line-height >= 1.4 */
+  --text-body--font-weight: 400; /* PROVISIONAL — replace with Figma value (OQ8) */
+
+  /* ui.label — Assistant */
+  --text-label: 0.875rem; /* PROVISIONAL — replace with Figma value (OQ8) */
+  --text-label--line-height: 1.4; /* PROVISIONAL — replace with Figma value (OQ8) */
+  --text-label--font-weight: 500; /* PROVISIONAL — replace with Figma value (OQ8) */
+
+  /* meta.small — Assistant */
+  --text-meta: 0.8125rem; /* PROVISIONAL — replace with Figma value (OQ8) */
+  --text-meta--line-height: 1.4; /* PROVISIONAL — replace with Figma value (OQ8) */
+  --text-meta--font-weight: 400; /* PROVISIONAL — replace with Figma value (OQ8) */
+
+  /* button.label — Assistant */
+  --text-button: 0.9375rem; /* PROVISIONAL — replace with Figma value (OQ8) */
+  --text-button--line-height: 1; /* PROVISIONAL — replace with Figma value (OQ8) */
+  --text-button--font-weight: 600; /* PROVISIONAL — replace with Figma value (OQ8) */
+
+  /* ---------------------------------------------------------------------- */
+  /* T4 — Spacing (Bible §14 named tiers + §8 section rhythm). All OQ2.      */
+  /* ---------------------------------------------------------------------- */
+  --spacing-xs: 0.25rem; /* PROVISIONAL — replace with Figma value (OQ2) */
+  --spacing-sm: 0.5rem; /* PROVISIONAL — replace with Figma value (OQ2) */
+  --spacing-md: 1rem; /* PROVISIONAL — replace with Figma value (OQ2) */
+  --spacing-lg: 2rem; /* PROVISIONAL — replace with Figma value (OQ2) */
+  --spacing-xl: 4rem; /* PROVISIONAL — replace with Figma value (OQ2) */
+
+  /* Section rhythm tiers (Bible §8 compact / regular / spacious / feature) */
+  --spacing-section-compact: 3rem; /* PROVISIONAL — replace with Figma value (OQ2) */
+  --spacing-section-regular: 5rem; /* PROVISIONAL — replace with Figma value (OQ2) */
+  --spacing-section-spacious: 8rem; /* PROVISIONAL — replace with Figma value (OQ2) */
+  --spacing-section-feature: 11rem; /* PROVISIONAL — replace with Figma value (OQ2) */
+
+  /* Container max-widths (Bible §8 "Use multiple max-width tokens, not one
+     container"). --container-* generates max-w-content / max-w-wide. */
+  --container-content: 72rem; /* PROVISIONAL — replace with Figma value (OQ2/OQ5) */
+  --container-wide: 90rem; /* PROVISIONAL — replace with Figma value (OQ2/OQ5) */
+
+  /* ---------------------------------------------------------------------- */
+  /* T5 — Radius + border width (Bible §8 / §14). Radii OQ3.                 */
+  /* ---------------------------------------------------------------------- */
+  --radius-sm: 0.25rem; /* PROVISIONAL — replace with Figma value (OQ3) */
+  --radius-md: 0.75rem; /* PROVISIONAL — replace with Figma value (OQ3) */
+  /* Signature quarter-circle / swoop. May be implemented via clip-path in
+     plan 8b rather than border-radius. */
+  --radius-signature: 4rem; /* PROVISIONAL — replace with Figma value (OQ3) */
+
+  /* Thin neutral rule — Bible §14 border.default width = 1px (stated). */
+  --border-width-default: 1px; /* Bible §14 border.default width */
+
+  /* ---------------------------------------------------------------------- */
+  /* T6 — Elevation (Bible §14 "depth very restrained"; §10 gentle lift).    */
+  /* ---------------------------------------------------------------------- */
+  --shadow-none: none; /* Bible §14 elevation.none */
+  /* Near-invisible lift for card hover; charcoal-tinted, not neutral black. */
+  --shadow-card-hover: 0 1px 2px 0 rgb(55 50 48 / 0.06),
+    0 2px 8px -2px rgb(55 50 48 / 0.08); /* PROVISIONAL — confirm with design (Bible §10/§14) */
+
+  /* ---------------------------------------------------------------------- */
+  /* T7 — Breakpoints (Bible §14 mobile/tablet/desktop/wide). All OQ5.       */
+  /* Min-width responsive variants: mobile: / tablet: / desktop: / wide:.    */
+  /* ---------------------------------------------------------------------- */
+  --breakpoint-mobile: 30rem; /* PROVISIONAL — replace with Figma value (OQ5) */
+  --breakpoint-tablet: 48rem; /* PROVISIONAL — replace with Figma value (OQ5) */
+  --breakpoint-desktop: 64rem; /* PROVISIONAL — replace with Figma value (OQ5) */
+  --breakpoint-wide: 90rem; /* PROVISIONAL — replace with Figma value (OQ5) */
+}
