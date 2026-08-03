@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Button } from "@/app/components/ui/button";
 import { Card } from "@/app/components/ui/card";
 import { Container } from "@/app/components/ui/container";
@@ -30,6 +31,12 @@ export default function Home() {
             <Button>Next</Button>
             <Button variant="secondary">Shuffle</Button>
           </div>
+
+          <Text variant="meta" as="p" className="mt-xl">
+            <Link href="/design" className="underline hover:text-text-primary">
+              Design system showcase →
+            </Link>
+          </Text>
         </Container>
       </Section>
     </main>
