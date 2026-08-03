@@ -9,8 +9,13 @@
  * PROVISIONAL markers: no Figma access. Values the Bible states explicitly are
  * used exactly; values marked "extract from Figma / needs formalization" use a
  * conservative default flagged `PROVISIONAL — replace with Figma value`.
+ *
+ * `static`: level colours are consumed only via a runtime `var(--color-level-<slug>)`
+ * built from a DB slug (level-map.ts), never as a literal Tailwind class — so
+ * Tailwind's usage scan can't see them and prunes any token it can't prove is
+ * referenced. `static` forces every variable here to always be emitted.
  */
-@theme {
+@theme static {
   /* ---------------------------------------------------------------------- */
   /* T1 — Brand / surface / text / border colours (Bible §5)                */
   /* ---------------------------------------------------------------------- */

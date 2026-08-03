@@ -55,12 +55,7 @@ export default async function Home({ searchParams }: HomeProps) {
               flip and cut the cards (src/app/CLAUDE.md). */}
           <div className="mt-xl flex min-h-96 flex-col items-center justify-center">
             {selection.deck && cards.length > 0 ? (
-              <CardDeck
-                key={deckKey}
-                cards={cards}
-                label={selection.deck.caption}
-                levelSlug={selection.deck.levelSlug}
-              />
+              <CardDeck key={deckKey} cards={cards} />
             ) : (
               <EmptyState empty={Boolean(selection.deck)} />
             )}

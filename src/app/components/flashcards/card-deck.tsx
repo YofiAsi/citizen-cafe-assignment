@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/app/components/ui/button";
-import { Text } from "@/app/components/ui/text";
 import { cn } from "@/app/components/ui/cn";
 import { playLadder, playSound, warmUp, type LadderSpec } from "./sound";
 
@@ -15,10 +14,6 @@ export type DeckCard = {
 
 export type CardDeckProps = {
   cards: DeckCard[];
-  /** Deck caption, e.g. "Foundation · Red" — the caller owns the mapping. */
-  label: string;
-  /** Level colour token slug, e.g. "red" → `var(--color-level-red)`. */
-  levelSlug: string;
 };
 
 /* Animation timings (ms). */
@@ -209,7 +204,7 @@ function ladders(count: number): { fall: LadderSpec; land: LadderSpec } {
   };
 }
 
-export function CardDeck({ cards, label, levelSlug }: CardDeckProps) {
+export function CardDeck({ cards }: CardDeckProps) {
   // stack[0] = bottom of the deck, stack[last] = top (mirrors z-order).
   // Entries are indices into `cards`.
   const [stack, setStack] = useState<number[]>(() => cards.map((_, i) => i));
@@ -340,27 +335,12 @@ export function CardDeck({ cards, label, levelSlug }: CardDeckProps) {
                 >
                   {/* Front — Hebrew (always Assistant, explicit dir/lang). */}
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-sm rounded-md border border-border-subtle bg-surface-raised shadow-card-hover backface-hidden">
-                    <span className="flex items-center gap-sm font-sans text-meta text-text-muted">
-                      <span
-                        className="size-2 rounded-full"
-                        style={{
-                          backgroundColor: `var(--color-level-${levelSlug})`,
-                        }}
-                      />
-                      {label}
-                    </span>
                     <span dir="rtl" lang="he" className="font-sans text-h1">
                       {card.hebrew}
-                    </span>
-                    <span className="font-sans text-meta text-text-muted">
-                      tap to flip
                     </span>
                   </div>
                   {/* Back — English on charcoal, yellow accent rule. */}
                   <div className="absolute inset-0 flex rotate-y-180 flex-col items-center justify-center gap-sm rounded-md border border-brand-charcoal bg-surface-dark backface-hidden">
-                    <span className="font-sans text-meta text-text-muted">
-                      English
-                    </span>
                     <span
                       dir="ltr"
                       lang="en"
@@ -385,9 +365,6 @@ export function CardDeck({ cards, label, levelSlug }: CardDeckProps) {
           Shuffle
         </Button>
       </div>
-      <Text variant="meta" as="p" className="mt-md text-center">
-        {cards.length} cards in the deck · tap the top card to flip it
-      </Text>
     </div>
   );
 }

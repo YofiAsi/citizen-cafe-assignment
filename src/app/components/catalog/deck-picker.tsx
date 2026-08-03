@@ -86,6 +86,7 @@ function Dropdown({
   ariaLabel: string;
   onChange: (slug: string) => void;
 }) {
+  const selected = options.find((option) => option.slug === value);
   return (
     <Select.Root
       value={value ?? undefined}
@@ -93,7 +94,20 @@ function Dropdown({
       disabled={disabled}
     >
       <Select.Trigger className={TRIGGER_CLASSES} aria-label={ariaLabel}>
-        <Select.Value placeholder={placeholder} />
+        <Select.Value placeholder={placeholder}>
+          {selected ? (
+            <span className="flex items-center gap-sm">
+              {selected.dotColor ? (
+                <span
+                  aria-hidden
+                  className="size-3 shrink-0 rounded-full"
+                  style={{ backgroundColor: selected.dotColor }}
+                />
+              ) : null}
+              {selected.label}
+            </span>
+          ) : null}
+        </Select.Value>
         <Select.Icon>
           <Chevron />
         </Select.Icon>
