@@ -8,7 +8,7 @@ import { Card } from "../entities/Card";
  *
  * References its Level (and optional Type) by id only, as they belong to the
  * separate Catalog aggregate. Holds its ordered Cards when they are loaded; the
- * list is empty when cards are fetched separately via the DeckRepository.
+ * list is empty when cards are fetched separately.
  */
 export class Deck extends Entity {
   constructor(

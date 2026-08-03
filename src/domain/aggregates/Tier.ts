@@ -8,7 +8,7 @@ import { Level } from "../entities/Level";
  * flow. The aggregate holds no Cards.
  *
  * Holds its ordered Levels when the tree is materialised; the list is empty
- * when Levels are loaded separately via the CatalogRepository.
+ * when Levels are loaded separately.
  */
 export class Tier extends Entity {
   constructor(
