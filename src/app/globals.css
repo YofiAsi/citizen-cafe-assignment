@@ -84,16 +84,18 @@
   /* is plan 8b — these stacks resolve to fallbacks for now.                 */
   /* ---------------------------------------------------------------------- */
 
-  /* Functional/system voice — Assistant (Bible §6 "Assistant = system").
-     Includes a Hebrew fallback since content is bilingual (RTL Hebrew). */
-  --font-sans: "Assistant", ui-sans-serif, system-ui, -apple-system,
+  /* Functional/system voice — Assistant (Bible §6 "Assistant = system"),
+     self-hosted via next/font (src/app/fonts.ts, hebrew + latin subsets).
+     Hebrew-first typeface — also renders all Hebrew vocabulary content. */
+  --font-sans: var(--font-assistant), ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans Hebrew", sans-serif;
 
   /* Expressive/brand voice — Fedra (Bible §6 "Fedra = voice"; §3 serif
-     editorial headlines). Seam: currently resolves to a serif fallback;
-     Fedra Serif slots in ahead of the fallbacks in plan 8b when files exist. */
-  --font-brand: "Fedra Serif", ui-serif, Georgia, Cambria, "Times New Roman",
-    "Noto Serif Hebrew", serif;
+     editorial headlines). Fedra is commercial with no licensed files here;
+     Frank Ruhl Libre (next/font, hebrew + latin) stands in (decision log #15).
+     "Fedra Serif" stays first so licensed files slot in without edits. */
+  --font-brand: "Fedra Serif", var(--font-frank-ruhl), ui-serif, Georgia,
+    Cambria, "Times New Roman", "Noto Serif Hebrew", serif;
 
   /* Role scale (Bible §6 roles). Sizes/weights PROVISIONAL (OQ8). The only
      fixed Bible constraint is body line-height >= 1.4. Family per role is a
@@ -153,6 +155,10 @@
      container"). --container-* generates max-w-content / max-w-wide. */
   --container-content: 72rem; /* PROVISIONAL — replace with Figma value (OQ2/OQ5) */
   --container-wide: 90rem; /* PROVISIONAL — replace with Figma value (OQ2/OQ5) */
+  /* Readable prose measure. NB: the named --spacing-* tokens shadow
+     Tailwind's default sized max-w-prose/md/lg/... utilities (they resolve to
+     the spacing scale), so always use max-w-content/wide/prose. */
+  --container-prose: 40rem; /* PROVISIONAL — replace with Figma value (OQ2) */
 
   /* ---------------------------------------------------------------------- */
   /* T5 — Radius + border width (Bible §8 / §14). Radii OQ3.                 */
@@ -182,4 +188,37 @@
   --breakpoint-tablet: 48rem; /* PROVISIONAL — replace with Figma value (OQ5) */
   --breakpoint-desktop: 64rem; /* PROVISIONAL — replace with Figma value (OQ5) */
   --breakpoint-wide: 90rem; /* PROVISIONAL — replace with Figma value (OQ5) */
+
+  /* ---------------------------------------------------------------------- */
+  /* Motion (Bible §13: calm, confident, editorial, restrained — soft fades  */
+  /* and subtle slides only; no bouncy or flashy animation). Plan 8b.        */
+  /* ---------------------------------------------------------------------- */
+  --ease-soft: cubic-bezier(0.25, 0.1, 0.25, 1);
+  /* Slight-overshoot spring for flashcard game-feel. Deliberate, approved
+     exception to Bible §13 "no bouncy motion" — the deck is the one playful
+     surface in the app; keep the overshoot subtle wherever this is used. */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --animate-fade-in: fade-in 0.4s var(--ease-soft) both;
+  --animate-fade-up: fade-up 0.5s var(--ease-soft) both;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
