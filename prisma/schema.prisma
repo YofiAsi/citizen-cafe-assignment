@@ -1,8 +1,10 @@
 // Prisma schema for Citizen Café Hebrew flashcards.
 // Learn more: https://pris.ly/d/prisma-schema
 //
-// This holds a single placeholder model so `prisma generate` succeeds.
-// The real taxonomy/content schema arrives in milestone 3b.
+// Taxonomy/content schema (milestone 3b). Models the 3a domain: the Catalog
+// tree (Tier → Level → Type), Decks, and their Cards. Number-keyed taxonomy
+// with nameless levels and no colour columns (decisions #16, #19); explicit
+// per-deck card ids from the seed (decision #18).
 
 generator client {
   provider = "prisma-client"
@@ -11,9 +13,84 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  // Prisma 7 no longer accepts `url` here. Migrations read the unpooled
+  // DIRECT_URL from prisma.config.ts; the runtime Prisma Client uses the pooled
+  // DATABASE_URL via an adapter (later milestone). Decision #13.
 }
 
-/// Placeholder — replaced by the real schema in milestone 3b.
-model Placeholder {
-  id Int @id @default(autoincrement())
+/// One of the three fixed progression stages (Foundation → Flow → Freedom).
+model Tier {
+  id       String @id @default(cuid())
+  name     String
+  position Int
+
+  levels Level[]
+
+  // Total order over the fixed 3-row set; also the seed's upsert key.
+  @@unique([position])
+}
+
+/// A numbered stage of fluency within a Tier. No name and no colour columns
+/// (decisions #16, #19): display labels are a UI mapping.
+model Level {
+  id       String @id @default(cuid())
+  tierId   String
+  position Int
+
+  tier  Tier   @relation(fields: [tierId], references: [id])
+  types Type[]
+  decks Deck[]
+
+  // Ordering guard within the Tier; also the seed's upsert key.
+  @@unique([tierId, position])
+}
+
+/// An optional content pack at the same fluency as its Level. No colour column
+/// and no tier restriction (decision #17).
+model Type {
+  id       String @id @default(cuid())
+  levelId  String
+  name     String
+  position Int
+
+  level Level  @relation(fields: [levelId], references: [id])
+  decks Deck[]
+
+  // Ordering guard within the Level; also the seed's upsert key.
+  @@unique([levelId, position])
+}
+
+/// The studied unit that holds cards: a typeless Level, or a (Level, Type) pair
+/// (decision #15).
+model Deck {
+  id      String  @id @default(cuid())
+  levelId String
+  typeId  String?
+
+  level Level  @relation(fields: [levelId], references: [id])
+  type  Type?  @relation(fields: [typeId], references: [id])
+  cards Card[]
+
+  // One deck per (Level, Type); also the seed's upsert key. The "at most one
+  // typeless deck per Level" half of invariant I4 needs a partial unique index
+  // (typeId IS NULL), hand-added in the migration SQL — Postgres treats NULLs
+  // as distinct, so this constraint alone does not cover the typeless case.
+  @@unique([levelId, typeId])
+}
+
+/// One Hebrew ↔ English study item inside a Deck.
+model Card {
+  id       String @id @default(cuid())
+  deckId   String
+  seedId   String
+  hebrew   String
+  english  String
+  position Int
+
+  deck Deck @relation(fields: [deckId], references: [id])
+
+  // seedId is the seed's per-deck upsert key (decision #18); position is the
+  // canonical display order and its ordering guard.
+  @@unique([deckId, seedId])
+  @@unique([deckId, position])
 }
