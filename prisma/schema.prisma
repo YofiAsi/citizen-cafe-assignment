@@ -1,0 +1,19 @@
+// Prisma schema for Citizen Café Hebrew flashcards.
+// Learn more: https://pris.ly/d/prisma-schema
+//
+// This holds a single placeholder model so `prisma generate` succeeds.
+// The real taxonomy/content schema arrives in milestone 3b.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Placeholder — replaced by the real schema in milestone 3b.
+model Placeholder {
+  id Int @id @default(autoincrement())
+}
