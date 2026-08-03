@@ -24,6 +24,11 @@ sits square.
 | Tap top card | Flips in 3D with a slight spring overshoot; English on the charcoal back. Only the top card is interactive. |
 | Next | Top card slides a short distance aside (200px, 220ms) staying fully visible, riding above the pile; then drops to the back of the z-order and slides home. The rest of the deck does not move. The incoming card is flippable immediately. |
 | Shuffle | Whole deck falls out of frame downward, fading as it goes, one card at a time. A 300ms beat with an empty table. Cards then fall back in from above and land on the stack one by one, bottom first. |
+| Deal in (on mount) | The deck mounts already waiting above the frame and plays only the landing half of Shuffle, in seed order. Picking a deck remounts the component (`key`), so this is how a chosen deck arrives. |
+
+The waiting positions for the deal-in are derived from the card index, not
+random: it is the deck's first render, which the server produces too, so it has
+to match on hydration.
 
 Timings and geometry are named constants at the top of the component — that is
 the tuning surface.

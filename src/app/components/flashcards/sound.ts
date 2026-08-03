@@ -1,5 +1,5 @@
 /**
- * Web Audio helper for the card lab.
+ * Web Audio helper for the flashcard deck.
  *
  * Clips are fetched and decoded once, then replayed with no latency;
  * playback rate gives pitch control for the ladders. Ladder hits are
@@ -39,7 +39,9 @@ const clipJobs = new Map<SoundName, Promise<AudioBuffer>>();
 /** Browsers only allow audio after a user gesture — call from a handler. */
 function getContext(): AudioContext {
   context ??= new AudioContext();
-  if (context.state === "suspended") void context.resume();
+  // Rejects when no gesture has happened yet (e.g. a deck deep-link deals
+  // itself in on load) — the next click resumes it.
+  if (context.state === "suspended") context.resume().catch(() => {});
   return context;
 }
 
