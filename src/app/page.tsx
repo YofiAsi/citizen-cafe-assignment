@@ -35,6 +35,10 @@ export default function Home() {
           <Text variant="meta" as="p" className="mt-xl">
             <Link href="/design" className="underline hover:text-text-primary">
               Design system showcase →
+            </Link>{" "}
+            ·{" "}
+            <Link href="/dev/cards" className="underline hover:text-text-primary">
+              Card deck harness →
             </Link>
           </Text>
         </Container>

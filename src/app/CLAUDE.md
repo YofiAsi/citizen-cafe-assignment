@@ -16,3 +16,11 @@
 - Presentational primitives live in `src/app/components/ui/` (`Container`, `Section`, `Heading`, `Text`, `Button`, `Card`). Compose UI from them instead of restyling raw elements; they take `className` for extension.
 - Width caps: only `max-w-content` / `max-w-wide` / `max-w-prose`. Tailwind's default sized `max-w-sm|md|lg|…` are shadowed by the named `--spacing-*` tokens (they compile to spacing values, e.g. `max-w-sm` → 0.5rem) — never use them.
 - Primitives stay presentational — no data fetching, no business logic, no state beyond what the element itself needs.
+
+## Flashcard deck (plan 7a)
+
+- The deck lives in `src/app/components/flashcards/`; its interaction model is frozen in `docs/plans/7a-flashcard-interaction.md`. Read that plan before changing motion, timings, or sound.
+- `CardDeck` takes cards plus a `label` and `levelSlug` — it never resolves level labels or colours itself, and never fetches.
+- Never place an `overflow: clip/hidden` ancestor above the cards: it flattens the 3D flip and clips the card to its own box.
+- Sound goes through `flashcards/sound.ts` (Web Audio). Files live in `public/sounds/`; keep that README's mapping current.
+- `ease-spring` is for the deck's game-feel only — the deliberate exception to Bible §13. Do not reach for it in general UI.
