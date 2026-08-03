@@ -15,6 +15,8 @@ Each part of the tree carries its own rules — read the local `CLAUDE.md` when 
 - `prisma/CLAUDE.md` — schema and migrations
 - `seed/CLAUDE.md` — content and seeding
 
+When important information (like a decision) directly concerns one of these areas, update that area's `CLAUDE.md` as well.
+
 
 
 ## Code Style
@@ -29,6 +31,7 @@ Each part of the tree carries its own rules — read the local `CLAUDE.md` when 
 - Types: `feat`, `fix`, `refactor`, `chore`, `docs`, `seed`. Scope is the affected area: `domain`, `application`, `infra`, `app`, `prisma`, `seed`, `docs`. Omit the scope when it would just repeat the type (e.g. `docs: ...`, not `docs(docs): ...`).
 - Summary in imperative mood, lowercase, no trailing period.
 - Each plan file (`docs/plans/*`) is committed together with the implementation work it describes, not separately.
+- Agent work must be approved by me before it is committed — agents finish, report, and leave the work uncommitted until approval.
 
 ## Dependencies
 
