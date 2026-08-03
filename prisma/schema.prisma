@@ -30,18 +30,22 @@ model Tier {
   @@unique([position])
 }
 
-/// A numbered stage of fluency within a Tier. No name and no colour columns
-/// (decisions #16, #19): display labels are a UI mapping.
+/// A stage of fluency within a Tier, identified by a stable slug ("red",
+/// "light-blue" — decision #21). No display-name or colour columns: the UI
+/// derives the shown label and colour token from the slug (decision #16).
 model Level {
   id       String @id @default(cuid())
   tierId   String
+  slug     String
   position Int
 
   tier  Tier   @relation(fields: [tierId], references: [id])
   types Type[]
   decks Deck[]
 
-  // Ordering guard within the Tier; also the seed's upsert key.
+  // Identity within the Tier and the seed's upsert key.
+  @@unique([tierId, slug])
+  // Ordering guard within the Tier.
   @@unique([tierId, position])
 }
 

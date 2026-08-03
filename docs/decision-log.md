@@ -4,6 +4,7 @@ Newest first. Every non-obvious technical or product decision gets a row: what w
 
 | # | Decision | Rationale |
 |---|---|---|
+| 21 | Levels carry an identity `slug` ("red", "light-blue"), unique per tier — the seed's upsert key and the UI's source for display labels and colour tokens; supersedes the level part of #19 (`position` is ordering only again) | Removes the hardcoded (tier, position) → label mapping in the UI, makes deep-link URLs readable, and survives level insertion/reordering; rename risk accepted as rarer and migration-fixable |
 | 20 | Runtime DB access uses a dedicated `app_readonly` Postgres role (SELECT-only, with default privileges for future tables); `neondb_owner` is used only by CLI operations over `DIRECT_URL` | Least privilege: a leaked runtime credential cannot modify or drop data; the app never writes |
 | 19 | Taxonomy keyed by numbers: seed upserts Tier/Level/Type on `position` within their parent (no slug columns); the Level table stores no name — Tier and Type store names, level display labels are a UI mapping | Level names are colour names, i.e. display concerns; the taxonomy is a fixed progression, so numeric identity is stable; avoids keying anything on display names |
 | 18 | Cards carry an explicit stable id in `seed/data.ts` (unique per deck); the seed upserts on (deck, id) | Keeps card identity stable across content edits and re-seeds, so the full product can attach per-user progress to cards without id churn |

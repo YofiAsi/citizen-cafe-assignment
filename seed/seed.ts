@@ -40,6 +40,12 @@ function deckKey(level: string, type: number | null): string {
   return `${level}::${type ?? "none"}`;
 }
 
+// Level identity slug (decision #21): the taxonomy label lowercased with
+// spaces as hyphens ("Light Blue" → "light-blue").
+function levelSlug(levelName: string): string {
+  return levelName.toLowerCase().replace(/\s+/g, "-");
+}
+
 // ── Validation (T2): collect every problem, then fail loudly before any write ──
 
 function validate(): void {
@@ -125,6 +131,7 @@ interface DesiredTier {
 interface DesiredLevel {
   tierName: string;
   levelName: string;
+  slug: string;
   position: number;
 }
 interface DesiredType {
@@ -158,6 +165,7 @@ function deriveTaxonomy(): DesiredTaxonomy {
     levels.push({
       tierName: deck.tier,
       levelName: deck.level,
+      slug: levelSlug(deck.level),
       position: nextPosition,
     });
   }
@@ -266,24 +274,32 @@ async function seed(): Promise<void> {
           }
         }
 
-        // Levels — key on (tierId, position). Level has no updatable columns, so
-        // it is only ever created or already correct.
+        // Levels — key on (tierId, slug) (decision #21); position is ordering
+        // only and may change.
         const levelIdByName = new Map<string, string>();
         const levelByKey = new Map(
-          existingLevels.map((l) => [`${l.tierId}::${l.position}`, l]),
+          existingLevels.map((l) => [`${l.tierId}::${l.slug}`, l]),
         );
         for (const level of desired.levels) {
           const tierId = requireId(tierIdByName, level.tierName, "tier");
-          const current = levelByKey.get(`${tierId}::${level.position}`);
+          const current = levelByKey.get(`${tierId}::${level.slug}`);
           if (!current) {
             const created = await tx.level.create({
-              data: { tierId, position: level.position },
+              data: { tierId, slug: level.slug, position: level.position },
             });
             levelIdByName.set(level.levelName, created.id);
             levelStats.created++;
           } else {
             levelIdByName.set(level.levelName, current.id);
-            levelStats.unchanged++;
+            if (current.position !== level.position) {
+              await tx.level.update({
+                where: { id: current.id },
+                data: { position: level.position },
+              });
+              levelStats.updated++;
+            } else {
+              levelStats.unchanged++;
+            }
           }
         }
 
@@ -349,10 +365,14 @@ async function seed(): Promise<void> {
         }
 
         // Cards — key on (deckId, seedId); hebrew/english/position may change.
-        // Nikud is written verbatim (no normalisation).
+        // Nikud is written verbatim (no normalisation). New cards are collected
+        // and inserted in one createMany: per-row creates (~230 round trips)
+        // can exceed the transaction timeout on a slow link, after which
+        // statements run outside the rolled-back transaction and FK-fail.
         const cardsByDeckAndSeed = new Map(
           existingCards.map((c) => [`${c.deckId}::${c.seedId}`, c]),
         );
+        const cardsToCreate: Prisma.CardCreateManyInput[] = [];
         for (const deck of content) {
           const contentKey = deckKey(deck.level, deck.type);
           const deckId = requireId(deckIdByContentKey, contentKey, "deck");
@@ -360,10 +380,7 @@ async function seed(): Promise<void> {
             const position = index + 1;
             const current = cardsByDeckAndSeed.get(`${deckId}::${pair.id}`);
             if (!current) {
-              await tx.card.create({
-                data: cardData(deckId, pair, position),
-              });
-              cardStats.created++;
+              cardsToCreate.push(cardData(deckId, pair, position));
             } else if (
               current.hebrew !== pair.hebrew ||
               current.english !== pair.english ||
@@ -382,6 +399,10 @@ async function seed(): Promise<void> {
               cardStats.unchanged++;
             }
           }
+        }
+        if (cardsToCreate.length > 0) {
+          await tx.card.createMany({ data: cardsToCreate });
+          cardStats.created += cardsToCreate.length;
         }
 
         // Reconcile-delete: drop cards whose seedId left the file for its deck.
@@ -423,9 +444,9 @@ function cardData(
   deckId: string,
   pair: Pair,
   position: number,
-): Prisma.CardCreateInput {
+): Prisma.CardCreateManyInput {
   return {
-    deck: { connect: { id: deckId } },
+    deckId,
     seedId: pair.id,
     hebrew: pair.hebrew,
     english: pair.english,
