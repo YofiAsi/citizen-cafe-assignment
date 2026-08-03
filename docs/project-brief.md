@@ -9,7 +9,7 @@ A public web app where learners study Hebrew vocabulary with flashcards, organis
 - **Tiers** (fixed progression): Foundation → Flow → Freedom.
 - **Levels**: each tier is split into colour-coded levels representing increasing fluency.
 - **Types**: some Freedom levels (Dark Green, Turquoise, Indigo) have types — separate content packs at the same mastery level, so learners keep learning without repeating words.
-- A **leaf node** is a level without types, or a level + type combination. Each leaf holds ~10 Hebrew ↔ English pairs.
+- A **deck** is a level without types, or a level + type combination. Each deck holds ~10 Hebrew ↔ English pairs.
 - The full taxonomy (level names, colours, type names) is provided separately and specified in the taxonomy spec (milestone 4a).
 
 
@@ -40,7 +40,7 @@ Exact versions are pinned in the scaffold plan (milestone 2a).
 
 ## Content Pipeline
 
-Vocabulary is generated **offline** with an AI assistant: for each leaf node, generate ~10 Hebrew ↔ English pairs, paste into `seed/data.ts`, and seed into Neon via an idempotent script. The app makes **no live LLM calls**.
+Vocabulary is generated **offline** with an AI assistant: for each deck, generate ~10 Hebrew ↔ English pairs, paste into `seed/data.ts`, and seed into Neon via an idempotent script. The app makes **no live LLM calls**.
 
 Example seed shape:
 
