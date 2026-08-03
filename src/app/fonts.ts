@@ -12,7 +12,7 @@ export const assistant = Assistant({
 
 /**
  * Stand-in for Fedra Serif (Bible §6 "Fedra = voice") — Fedra is a commercial
- * Typotheque font with no licensed files in this repo (decision log #15).
+ * Typotheque font with no licensed files in this repo (decision log #23).
  * The `--font-brand` token lists "Fedra Serif" first, so licensed files
  * loaded via next/font/local later take over without component changes.
  */

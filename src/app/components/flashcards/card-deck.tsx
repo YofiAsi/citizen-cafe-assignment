@@ -361,7 +361,11 @@ export function CardDeck({ cards, label, levelSlug }: CardDeckProps) {
                     <span className="font-sans text-meta text-text-muted">
                       English
                     </span>
-                    <span className="px-md text-center font-sans text-h2 text-text-inverse">
+                    <span
+                      dir="ltr"
+                      lang="en"
+                      className="px-md text-center font-sans text-h2 text-text-inverse"
+                    >
                       {card.english}
                     </span>
                     <span className="mt-xs h-1 w-lg rounded-sm bg-brand-yellow" />
