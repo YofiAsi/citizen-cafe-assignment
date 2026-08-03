@@ -1,15 +1,28 @@
+import { existsSync } from "node:fs";
 import { defineConfig } from "prisma/config";
 
-// Prisma v7 no longer auto-loads .env. The datasource URL is read from the
-// DATABASE_URL environment variable; actual connection wiring (Neon, .env
-// loading) lands in milestone 2b. `process.env` is used rather than the
-// throwing `env()` helper so `prisma generate` works before a URL exists.
+// Prisma v7 no longer auto-loads .env. Load it here with Node's built-in
+// loader (zero dependencies) so CLI commands that need a database — migrate,
+// introspect, studio — can read the connection string from .env. Guarded so
+// `prisma generate` (which needs no connection) still works before a .env
+// exists.
+if (existsSync(".env")) {
+  process.loadEnvFile();
+}
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
   },
+  // The Prisma CLI (migrations, introspection) connects with DIRECT_URL — the
+  // direct, unpooled Neon connection string, which is what migrations require.
+  // The app runtime uses the pooled DATABASE_URL when the Prisma Client is
+  // instantiated (persistence layer, later milestone); prisma.config.ts is
+  // consumed only by CLI tooling, never bundled into the runtime.
+  // `process.env` (not the throwing `env()` helper) keeps `prisma generate`
+  // working before a URL exists.
   datasource: {
-    url: process.env["DATABASE_URL"],
+    url: process.env["DIRECT_URL"],
   },
 });
