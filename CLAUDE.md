@@ -28,6 +28,7 @@ Each part of the tree carries its own rules — read the local `CLAUDE.md` when 
 - Conventional Commits: `type(scope): summary` — e.g. `feat(app): add tier dropdown`.
 - Types: `feat`, `fix`, `refactor`, `chore`, `docs`, `seed`. Scope is the affected area: `domain`, `application`, `infra`, `app`, `prisma`, `seed`, `docs`. Omit the scope when it would just repeat the type (e.g. `docs: ...`, not `docs(docs): ...`).
 - Summary in imperative mood, lowercase, no trailing period.
+- Each plan file (`docs/plans/*`) is committed together with the implementation work it describes, not separately.
 
 ## Dependencies
 
