@@ -13,10 +13,12 @@ export interface TierDTO {
   position: number;
 }
 
-/** A numbered fluency stage within a Tier. No name — its label is a UI mapping
- * (decision #19). */
+/** A fluency stage within a Tier, identified by its slug ("red", "light-blue"
+ * — decision #21). The UI derives the shown label and colour token from the
+ * slug; the DB stores no display name (decision #16). */
 export interface LevelDTO {
   id: string;
+  slug: string;
   position: number;
 }
 
@@ -34,6 +36,45 @@ export interface CardDTO {
   english: string;
 }
 
+/** A Level with its Types, as part of the full catalog tree. */
+export interface CatalogLevelDTO extends LevelDTO {
+  types: TypeDTO[];
+}
+
+/** A Tier with its Levels and their Types — the full navigation tree. */
+export interface CatalogTierDTO extends TierDTO {
+  levels: CatalogLevelDTO[];
+}
+
+/**
+ * The whole navigation tree (tiers → levels → types) in a single database
+ * round trip. Rendering the cascading dropdowns from per-scope calls costs
+ * 1 + 3 + 12 sequential queries; the taxonomy is tiny (29 rows), so the UI
+ * should fetch it once with this and derive the dropdowns in memory.
+ */
+export function getCatalog(): Promise<CatalogTierDTO[]> {
+  return prisma.tier.findMany({
+    select: {
+      id: true,
+      name: true,
+      position: true,
+      levels: {
+        select: {
+          id: true,
+          slug: true,
+          position: true,
+          types: {
+            select: { id: true, name: true, position: true },
+            orderBy: { position: "asc" },
+          },
+        },
+        orderBy: { position: "asc" },
+      },
+    },
+    orderBy: { position: "asc" },
+  });
+}
+
 /** Tiers ordered by progression (Foundation → Flow → Freedom). */
 export function listTiers(): Promise<TierDTO[]> {
   return prisma.tier.findMany({
@@ -46,7 +87,7 @@ export function listTiers(): Promise<TierDTO[]> {
 export function listLevels(tierId: string): Promise<LevelDTO[]> {
   return prisma.level.findMany({
     where: { tierId },
-    select: { id: true, position: true },
+    select: { id: true, slug: true, position: true },
     orderBy: { position: "asc" },
   });
 }
@@ -64,7 +105,8 @@ export function listTypes(levelId: string): Promise<TypeDTO[]> {
  * Cards of the Deck for a (Level, Type?) selection, in canonical order.
  * `typeId === null` resolves the Level's typeless deck. The typeless case
  * (typeId IS NULL) is a partial-unique match, not addressable by findUnique,
- * so the deck is resolved with findFirst. A missing deck returns `[]`.
+ * so the deck is resolved with findFirst — cards ride along in the same
+ * round trip via the relation. A missing deck returns `[]`.
  */
 export async function getCards(
   levelId: string,
@@ -72,13 +114,12 @@ export async function getCards(
 ): Promise<CardDTO[]> {
   const deck = await prisma.deck.findFirst({
     where: { levelId, typeId },
-    select: { id: true },
+    select: {
+      cards: {
+        select: { id: true, hebrew: true, english: true },
+        orderBy: { position: "asc" },
+      },
+    },
   });
-  if (!deck) return [];
-
-  return prisma.card.findMany({
-    where: { deckId: deck.id },
-    select: { id: true, hebrew: true, english: true },
-    orderBy: { position: "asc" },
-  });
+  return deck?.cards ?? [];
 }

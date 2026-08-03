@@ -5,6 +5,7 @@
 
 import { cache } from "react";
 import {
+  getCatalog as getCatalogQuery,
   listTiers as listTiersQuery,
   listLevels as listLevelsQuery,
   listTypes as listTypesQuery,
@@ -16,8 +17,11 @@ export type {
   LevelDTO,
   TypeDTO,
   CardDTO,
+  CatalogLevelDTO,
+  CatalogTierDTO,
 } from "@/infrastructure/persistence/queries";
 
+export const getCatalog = cache(getCatalogQuery);
 export const listTiers = cache(listTiersQuery);
 export const listLevels = cache(listLevelsQuery);
 export const listTypes = cache(listTypesQuery);
