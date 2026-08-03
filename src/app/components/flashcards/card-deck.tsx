@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/app/components/ui/button";
 import { Text } from "@/app/components/ui/text";
 import { cn } from "@/app/components/ui/cn";
@@ -111,6 +111,18 @@ function randomDrop(): Toss {
   };
 }
 
+/**
+ * The same waiting spot, but derived rather than random: the deal-in is the
+ * deck's first render, which the server produces too, so it has to be stable.
+ */
+function enterDrop(cardIndex: number): Toss {
+  return {
+    x: spread(cardIndex, SPREAD_STEPS.x) * DROP_DRIFT,
+    y: DROP_Y,
+    rot: spread(cardIndex, SPREAD_STEPS.rot) * DROP_TILT,
+  };
+}
+
 function shuffled<T>(items: T[]): T[] {
   const copy = [...items];
   for (let i = copy.length - 1; i > 0; i--) {
@@ -169,6 +181,11 @@ function cardDuration(
   return undefined;
 }
 
+/** How long a whole deck takes to land, last card included. */
+function restackMs(count: number): number {
+  return RESTACK_CARD_MS + RESTACK_STEP_MS * count;
+}
+
 function ladders(count: number): { fall: LadderSpec; land: LadderSpec } {
   const shared = {
     sound: "click",
@@ -197,12 +214,34 @@ export function CardDeck({ cards, label, levelSlug }: CardDeckProps) {
   // Entries are indices into `cards`.
   const [stack, setStack] = useState<number[]>(() => cards.map((_, i) => i));
   const [flipped, setFlipped] = useState(false);
-  const [phase, setPhase] = useState<Phase>("idle");
+  // The deck arrives mid-shuffle: it starts waiting above the frame and rains
+  // down on mount, so picking a deck deals it in.
+  const [phase, setPhase] = useState<Phase>("above");
   // Toss targets per card (keyed by card index), fresh every shuffle.
-  const [tosses, setTosses] = useState<Toss[]>([]);
+  const [tosses, setTosses] = useState<Toss[]>(() =>
+    cards.map((_, i) => enterDrop(i)),
+  );
   const [leave, setLeave] = useState<Leave | null>(null);
 
   const ladderSpecs = useMemo(() => ladders(cards.length), [cards.length]);
+
+  useEffect(() => {
+    // One frame in the waiting spot so the drop is a transition, not a jump.
+    const frame = requestAnimationFrame(() => {
+      setPhase("restack");
+      playLadder(ladderSpecs.land);
+    });
+    const settle = window.setTimeout(
+      () => setPhase("idle"),
+      restackMs(cards.length),
+    );
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(settle);
+    };
+    // Deal-in runs once per mounted deck; the page remounts it per deck.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const shuffling = phase !== "idle";
   const busy = shuffling || leave?.stage === "out";
@@ -236,10 +275,7 @@ export function CardDeck({ cards, label, levelSlug }: CardDeckProps) {
       window.setTimeout(() => {
         setPhase("restack");
         playLadder(ladderSpecs.land);
-        window.setTimeout(
-          () => setPhase("idle"),
-          RESTACK_CARD_MS + RESTACK_STEP_MS * cards.length,
-        );
+        window.setTimeout(() => setPhase("idle"), restackMs(cards.length));
       }, ABOVE_SWAP_MS);
     }, FALL_MS + FALL_HOLD_MS);
   }
